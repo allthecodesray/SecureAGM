@@ -1,0 +1,62 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}
+List of Ballots
+{% endblock %}
+
+{% block navbar %}
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Secure AGM</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="#">AGMs</a></li>
+      <li><a href="#">Agendas</a></li>
+  
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span>{{current_user.email}}</a></li>
+      <li><a href="{{url_for('logout')}}"><span class="glyphicon glyphicon-log-out"></span>Log Out</a></li>
+    </ul>
+  </div>
+</nav> 
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="row">
+<div class="span5">
+<h2>{{mtitle}} Agenda</h2>
+  <p>Ballots on this Agenda</p>
+<div class="row-fluid">
+<div class="span5">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+      	<th>Agenda Item#</th>
+        <th>Ballot Name</th>
+        <th>Proposal</th>
+        <th>Vote Type</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {%for row in data %}
+      <tr>
+    {% for d in row %}
+        <td>{{ d }}</td>
+    {% endfor %}
+    {% set i = loop.index - 1%}
+    	<td><a href="{{url_for('displayVoteForm',key=ids[i])}}">Cast Your Vote</a>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+{% endblock %}
