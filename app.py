@@ -16,14 +16,15 @@ from werkzeug import generate_password_hash, check_password_hash
 from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-mysql = MySQL()
 
+#app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+mysql = MySQL()
+app.config.from_pyfile('dev_config.cfg')
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'FakeLaugh89'
-app.config['MYSQL_DATABASE_DB'] = 'AGM_RECORDS'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+#app.config['MYSQL_DATABASE_USER'] = 'root'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'FakeLaugh89'
+#app.config['MYSQL_DATABASE_DB'] = 'AGM_RECORDS'
+#app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -179,5 +180,5 @@ def logout():
     logout_user()
     return redirect(url_for('login'))            
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+#if __name__ == "__main__":
+#    app.run(host='0.0.0.0', debug=True)
