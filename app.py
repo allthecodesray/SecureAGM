@@ -198,12 +198,20 @@ def castVote():
     if form.validate_on_submit():
         op_select = form.picker.data
         bal_id = session.get('ballot')
-        cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
-        data=cursor.fetchall();
-        if len(data) is 0:
-            conn.commit()
-            flash("Your vote was successfully recorded..")   
-            return redirect(url_for('showAgenda'))
+        
+        try:
+            conn = mysql.connect()
+            cursor=conn.cursor()
+            cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
+            data=cursor.fetchall();
+            
+        finally:
+
+            if len(data) is 0:
+                conn.commit()
+                conn.close()
+                flash("Your vote was successfully recorded..")   
+                return redirect(url_for('showAgenda'))
     else:
         print form.errors
         return "Error...."
