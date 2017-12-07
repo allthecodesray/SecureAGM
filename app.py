@@ -35,11 +35,18 @@ Bootstrap(app)
 
 @login_manager.user_loader
 def load_user(vid):
-    cursor.callproc('GetByVoterID',(vid,))
-    results=cursor.fetchall()
-    conn.commit()
-    user = Voter(results[0][0],results[0][1])
-    return user
+    
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.callproc('GetByVoterID',(vid,))
+        results=cursor.fetchall()
+        
+    finally:
+        conn.commit()
+        user = Voter(results[0][0],results[0][1])
+        conn.close()
+        return user
 
 @app.before_request
 def before_request():
@@ -58,20 +65,28 @@ def login():
         return render_template('login.html', form=form)
     elif request.method == 'POST':
         if form.validate_on_submit():
-            cursor.callproc('ValidateLogin',(form.email.data,))
-            rv=cursor.fetchall()
+            try:
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                cursor.callproc('ValidateLogin',(form.email.data,))
+                rv=cursor.fetchall()
+                
+            finally:
+                conn.commit()
+                conn.close()
    #         user=User.query.filter_by(email=form.email.data).first()
-            print len(rv)
-            if len(rv) != 0:
+                print len(rv)
+                if len(rv) != 0:
                # print rv
-                if check_password_hash(str(rv[0][2]),form.password.data):
-                    voter = Voter(rv[0][0],rv[0][1])
-                    login_user(voter)
-                    return redirect(url_for('showAGMs'))                
+                    if check_password_hash(str(rv[0][2]),form.password.data):
+                        voter = Voter(rv[0][0],rv[0][1])
+                        login_user(voter)
+                        return redirect(url_for('showAGMs'))                
+                    else:
+                        return "Wrong password"            
                 else:
-                    return "Wrong password"            
-            else:
-                return "user doesn't exist"
+                    return "user doesn't exist"
+            
         else:
             return "form not validated"        
     else:
@@ -83,9 +98,17 @@ def showAGMs():
     
     ids = []
     a_fields = []
-    cursor.callproc('showVoterAGMs')
-    rv=cursor.fetchall()
-    conn.commit()
+    
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.callproc('showVoterAGMs')
+        rv=cursor.fetchall()
+        
+    finally:
+        conn.commit()
+        conn.close()
+        
     for row in rv:
         ids.append(row[0])
         a_fields.append(row[1:5])
@@ -106,10 +129,14 @@ def showAgenda():
     else:
         agm_key = session.get('agm')
         mname = session.get('a_title')
-        
-    cursor.callproc('GetBallots',(agm_key,))
-    rv=cursor.fetchall()
-    conn.commit();
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()    
+        cursor.callproc('GetBallots',(agm_key,))
+        rv=cursor.fetchall()
+    finally:
+        conn.commit()
+        conn.close()
     for row in rv:
         b_keys.append(row[0])
         b_fields.append(row[1:4])
@@ -121,10 +148,17 @@ def displayVoteForm():
 
     form = VoteForm()
     b_id = request.args.get('key')
-    session['ballot'] = b_id
-    cursor.callproc('SelectBallotAndChoices',(b_id,))
-    data=cursor.fetchall()
-    conn.commit()
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        session['ballot'] = b_id
+        cursor.callproc('SelectBallotAndChoices',(b_id,))
+        data=cursor.fetchall()
+        
+    finally:
+        conn.commit()
+        conn.close()
+        
     bname=data[0][0]
     prop=data[0][1]
         
