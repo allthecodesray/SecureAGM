@@ -15,3 +15,4 @@ class LogInForm(Form):
 class VoteForm(Form):
     picker = RadioField('Label', choices=[], coerce=int,validators=[DataRequired()])
     submit = SubmitField("Cast Vote")
+    cancel = SubmitField("Go To Agenda")

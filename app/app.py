@@ -163,6 +163,7 @@ def displayVoteForm():
     
         for result in data:
             form.picker.choices.append((result[2],result[3]))
+         #   form.picker.choices.set_default(result[2])
         
 
   
@@ -176,27 +177,48 @@ def castVote():
     
     form = VoteForm()
     print form.errors
-
+    voteExists = False
+    
     if form.validate_on_submit():
-        op_select = form.picker.data
-        bal_id = session.get('ballot')
         
-        try:
-            conn = mysql.connect()
-            cursor=conn.cursor()
-            cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
-            data=cursor.fetchall();
+        print form.cancel.data
+        if form.submit.data:
+            op_select = form.picker.data
+            bal_id = session.get('ballot')
+        
+            try:
+                conn = mysql.connect()
+                cursor=conn.cursor()
+                cursor.callproc('checkForVote',(bal_id,current_user.vid))
+                data=cursor.fetchall();
             
-        finally:
+                if len(data) is 0:
+                    cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
+                    data=cursor.fetchall()
+                
+                else:
+                    voteExists = True
+                
+                    
+            finally:
 
-            if len(data) is 0:
+        
                 conn.commit()
                 conn.close()
+            
+            if not voteExists:
                 flash("Your vote was successfully recorded..")   
-                return redirect(url_for('showAgenda'))
+                
+            else:
+                flash("You have already voted for this ballot!")
+                
+            return redirect(url_for('displayVoteForm',key=bal_id))
+        
+        elif form.cancel.data:
+            return redirect(url_for('showAGMs'))
+        
     else:
-        print form.errors
-        return "Error...."
+        return "form not validated"      
 
 @app.route("/logout")
 @login_required
