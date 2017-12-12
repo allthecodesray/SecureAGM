@@ -1,7 +1,7 @@
 '''
 Created on Oct 29, 2017
 
-@author: Raymond O'Connor
+@author: Raymond O'Connor <x16137981@student.ncirl.ie>
 '''
 #app.py
 from flask import Flask, render_template, request, json, redirect,url_for,Response, flash,session
@@ -17,14 +17,10 @@ from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 
-#app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+
 mysql = MySQL()
 app.config.from_pyfile('config.cfg')
-# MySQL configurations
-#app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'FakeLaugh89'
-#app.config['MYSQL_DATABASE_DB'] = 'AGM_RECORDS'
-#app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+
 mysql.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -76,10 +72,9 @@ def login():
             finally:
                 conn.commit()
                 conn.close()
-   #         user=User.query.filter_by(email=form.email.data).first()
                 print len(rv)
                 if len(rv) != 0:
-               # print rv
+               
                     if check_password_hash(str(rv[0][2]),form.password.data):
                         voter = Voter(rv[0][0],rv[0][1])
                         login_user(voter)
@@ -174,29 +169,14 @@ def displayVoteForm():
 
     return render_template("votenow.html", ballot_name=bname,proposal_text=prop,form=form )
     
-#    else:
-#       if request.method == 'POST':
-#          if form.validate_on_submit():
-#             print form.picker.data
-#            return "Form Submitted"
-#   else:#      print form.errors
-#     return "Errors..."
 
-        
-# get the casted vote information
 
 @app.route("/castVote",methods=['POST'])
 def castVote():
     
     form = VoteForm()
     print form.errors
-#    cursor.callproc('RecordVotePart1',(op_select,1))
-#    data=cursor.fetchall();
-#    if len(data) is 0:
-#        conn.commit()
-#        return json.dumps({'html':'<span>All fields good !!</span>'})
-#    else:
-#       return json.dumps({'error':str(data[0])})
+
     if form.validate_on_submit():
         op_select = form.picker.data
         bal_id = session.get('ballot')
@@ -223,6 +203,3 @@ def castVote():
 def logout():
     logout_user()
     return redirect(url_for('login'))            
-
-#if __name__ == "__main__":
-#    app.run(host='0.0.0.0', debug=True)

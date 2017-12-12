@@ -1,7 +1,7 @@
 '''
 Created on Nov 19, 2017
 
-@author: osboxes
+@author: Raymond O'Connor <x16137981@student.ncirl.ie>
 '''
 
 from flask_login import UserMixin
