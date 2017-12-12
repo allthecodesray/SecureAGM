@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 #app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 mysql = MySQL()
-app.config.from_pyfile('dev_config.cfg')
+app.config.from_pyfile('config.cfg')
 # MySQL configurations
 #app.config['MYSQL_DATABASE_USER'] = 'root'
 #app.config['MYSQL_DATABASE_PASSWORD'] = 'FakeLaugh89'
@@ -55,7 +55,9 @@ def before_request():
     session.modified = True
     user = current_user
 
-
+@app.route("/")
+def index():
+    return redirect(url_for('login'))
 
 @app.route("/login",methods=['GET','POST'])
 def login():
