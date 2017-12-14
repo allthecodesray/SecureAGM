@@ -10,11 +10,18 @@ Secure AGM Voting Form
 	<h1>{{ballot_name}} -- Vote NOW</h1>
 	<p>{{proposal_text}}</p>
 </div>
+
   {% with messages = get_flashed_messages() %}
    {% if messages %}
       {% for message in messages %}
-         {{ message }}
+      {% if "successfully" in message %}
+    	<div class="alert alert-success"><strong>Success ! </strong>
+   {% else %}
+   		<div class ="alert alert-danger"><strong>Warning ! </strong>
+   	{% endif %} 
+  {{ message }}         
       {% endfor %}
+  </div>
    {% endif %}
 {% endwith %}
 <d1>

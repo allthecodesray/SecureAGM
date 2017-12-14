@@ -13,6 +13,7 @@ class LogInForm(Form):
     submit = SubmitField("Log In")
     
 class VoteForm(Form):
-    picker = RadioField('Label', choices=[], coerce=int,validators=[DataRequired()])
+   # picker = RadioField('Label', choices=[], coerce=int,validators=[DataRequired()])
+    picker = RadioField('Label', choices=[], coerce=int)
     submit = SubmitField("Cast Vote")
     cancel = SubmitField("Go To Agenda")

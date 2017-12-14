@@ -143,7 +143,8 @@ def showAgenda():
 @app.route("/displayVoteForm")
 def displayVoteForm():
 
-    form = VoteForm()
+    
+    coll = []
     b_id = request.args.get('key')
     try:
         conn = mysql.connect()
@@ -159,15 +160,15 @@ def displayVoteForm():
     bname=data[0][0]
     prop=data[0][1]
         
-    if len(form.picker.choices) == 0:
+    #if len(form.picker.choices) == 0:
     
-        for result in data:
-            form.picker.choices.append((result[2],result[3]))
+    for result in data:
+        coll.append((result[2],result[3]))
          #   form.picker.choices.set_default(result[2])
         
-
-  
-
+    print coll
+    form = VoteForm()
+    form.picker.choices=coll
     return render_template("votenow.html", ballot_name=bname,proposal_text=prop,form=form )
     
 
@@ -179,32 +180,32 @@ def castVote():
     print form.errors
     voteExists = False
     
-    if form.validate_on_submit():
+    #if form.validate_on_submit():
         
-        print form.cancel.data
-        if form.submit.data:
-            op_select = form.picker.data
-            bal_id = session.get('ballot')
+        #print form.cancel.data
+    if form.submit.data:
+        op_select = form.picker.data
+        bal_id = session.get('ballot')
         
-            try:
-                conn = mysql.connect()
-                cursor=conn.cursor()
-                cursor.callproc('checkForVote',(bal_id,current_user.vid))
-                data=cursor.fetchall();
+        try:
+            conn = mysql.connect()
+            cursor=conn.cursor()
+            cursor.callproc('checkForVote',(bal_id,current_user.vid))
+            data=cursor.fetchall();
             
-                if len(data) is 0:
-                    cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
-                    data=cursor.fetchall()
+            if len(data) is 0:
+                cursor.callproc('RecordVote',(bal_id,current_user.vid,op_select))
+                data=cursor.fetchall()
                 
-                else:
-                    voteExists = True
+            else:
+                voteExists = True
                 
                     
-            finally:
+        finally:
 
         
-                conn.commit()
-                conn.close()
+            conn.commit()
+            conn.close()
             
             if not voteExists:
                 flash("Your vote was successfully recorded..")   
@@ -214,11 +215,12 @@ def castVote():
                 
             return redirect(url_for('displayVoteForm',key=bal_id))
         
-        elif form.cancel.data:
-            return redirect(url_for('showAGMs'))
+    elif form.cancel.data:
+        return redirect(url_for('showAGMs'))
         
-    else:
-        return "form not validated"      
+    #else:
+      #  return "form not validated"
+       # print form.errors      
 
 @app.route("/logout")
 @login_required
